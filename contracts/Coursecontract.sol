@@ -14,9 +14,10 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
     uint256 public courseCounter;
     mapping(address => mapping(uint256 => bool)) isEnrolled;
     mapping(address => mapping(uint256 => uint8)) public progress;
-    mapping(address => mapping(uint256 => uint256[])) public completedLessons;
     mapping(uint256 => address[]) public participants;
     mapping(uint256 => Course) public courses;
+    mapping(address => uint256) public points;
+    mapping(address => mapping(uint256 => bool)) public completedCourses;
 
     event CourseEnrolled(address indexed user, uint256 courseId);
     event ProgressUpdated(
@@ -25,8 +26,8 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
         uint8 progress
     );
 
-    modifier domainOwner() {
-        bytes32 node = reverse.node(_msgSender());
+    modifier domainOwner(address user) {
+        bytes32 node = reverse.node(user);
         require(node != bytes32(0), "No .creator Primary Domain name");
         _;
     }
@@ -93,7 +94,10 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
         return courseCounter;
     }
 
-    function enroll(uint _id, address _user) public domainOwner {
+    function enroll(
+        uint _id,
+        address _user
+    ) public onlyOwner domainOwner(_user) {
         require(_id < courseCounter, "Course does not exist");
 
         require(!isEnrolled[_user][_id], "User is already enrolled");
@@ -104,22 +108,27 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
 
     function updateCourseProgress(
         uint256 _courseId,
-        uint256 _lessonId,
-        uint8 _progress
-    ) public domainOwner {
+        uint8 _progress,
+        address _user,
+        uint256 _points
+    ) public onlyOwner domainOwner(_user) {
         require(_courseId < courseCounter, "Course does not exist");
 
         require(
-            isEnrolled[_msgSender()][_courseId],
+            isEnrolled[_user][_courseId],
             "User must be enrolled in the course"
         );
         require(_progress <= 100, "Progress cannot exceed 100%");
 
-        progress[_msgSender()][_courseId] = _progress;
+        progress[_user][_courseId] = _progress;
+        points[_user] = _points; // Update user points
         if (_progress == 100) {
-            completedLessons[_msgSender()][_courseId].push(_lessonId);
+            // If progress is 100%, mark as completed
+            isEnrolled[_user][_courseId] = false; // Unenroll user
+            // Optionally, you can add logic to handle completed lessons here
+            completedCourses[_user][_courseId] = true; // Mark course as completed
         }
-        emit ProgressUpdated(_msgSender(), _courseId, _progress);
+        emit ProgressUpdated(_user, _courseId, _progress);
     }
 
     function getCourse(
@@ -128,23 +137,20 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
     )
         public
         view
-        returns (
-            Course memory,
-            bool enrolled,
-            uint8 score,
-            uint256[] memory lessonIds,
-            uint256 attendees
-        )
+        returns (Course memory, bool enrolled, uint8 score, uint256 attendees)
     {
         require(_id < courseCounter, "Course does not exist");
 
         Course storage course = courses[_id];
         bool isUserEnrolled = isEnrolled[_user][_id]; // Direct lookup
         uint8 userProgress = isUserEnrolled ? progress[_user][_id] : 0;
-        uint256[] memory ids = completedLessons[_user][_id];
         uint256 length = participants[_id].length;
 
-        return (course, isUserEnrolled, userProgress, ids, length);
+        return (course, isUserEnrolled, userProgress, length);
+    }
+
+    function getUserPoints(address _user) public view returns (uint256) {
+        return points[_user];
     }
 
     function getCourses() public view returns (Course[] memory) {

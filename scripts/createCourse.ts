@@ -91,7 +91,7 @@ By the end of this quick, fun-packed journey, you’ll have a content creation s
         'Craft blog intros that retain readers, using a simple 3-step structure.',
       ],
       duration: '30',
-    },
+    }, */
     {
       id: 1,
       title: 'Personal Branding For Modern Creators',
@@ -175,7 +175,7 @@ By the end of this quick, fun-packed journey, you’ll have a content creation s
       ],
       duration: '30',
     }, 
-     {
+    /* {
       id: 2,
       title: 'On-Chain and Unshaken: The Web3 Security Playbook',
       description:
@@ -329,7 +329,7 @@ By the end, you'll feel confident managing wallets, recognizing scams, and prote
       prerequisites: ['Minted .creator domain'],
       objectives: [],
       duration: '30',
-    },*/
+    },
      {
       id: 4,
       title: 'InfoFi Playbook Course: Winning the Game of Attention on Kaito',
@@ -406,11 +406,11 @@ By the end, you'll feel confident managing wallets, recognizing scams, and prote
         'Use tracking tools, reply lists, and timing techniques',
       ],
       duration: '30',
-    },
+    }, */
   ]
   const factory = await ethers.getContractAt(
     'CourseFactory',
-    '0x6F2104DF46A6F49945Ae5794e7fAb5CEf8741C9C',
+    '0x7574275be44365Eea5e55a5dab6639826Cb200cF',
   )
 
   for (const course of courses) {
