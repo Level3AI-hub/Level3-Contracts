@@ -7,9 +7,12 @@ import "./ILevel3Course.sol";
 import "./CourseFactory.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
+import "./ENS.sol";
+import "./INameResolver.sol";
 
-contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
+contract Level3Course is ILevel3Course, Ownable {
     IReverseRegistrar public reverse;
+    ENS public registry;
     address public courseFactory;
     uint256 public courseCounter;
     mapping(address => mapping(uint256 => bool)) isEnrolled;
@@ -28,7 +31,13 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
 
     modifier domainOwner(address user) {
         bytes32 node = reverse.node(user);
-        require(node != bytes32(0), "No .creator Primary Domain name");
+        address resolver = registry.resolver(node);
+        string memory name = INameResolver(resolver).name(node);
+
+        require(
+            keccak256(bytes(name)) != keccak256(bytes("")),
+            "No .safu Primary Name"
+        );
         _;
     }
 
@@ -38,11 +47,12 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
     }
 
     constructor(
-        address _forwarder,
         address _reverse,
-        address owner
-    ) ERC2771Context(_forwarder) Ownable(owner) {
+        address owner,
+        address _registry
+    ) Ownable(owner) {
         reverse = IReverseRegistrar(_reverse);
+        registry = ENS(_registry);
     }
 
     function setCourseFactory(address _factory) external onlyOwner {
@@ -50,44 +60,23 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
         courseFactory = _factory;
     }
 
+    function deleteCourse(uint256 _courseId) public onlyOwner {
+        delete courses[_courseId];
+    }
+
     function updateCourseRegistry(
-        Course memory course,
-        uint256 coursecounter
+        uint256 coursecounter,
+        Course memory course
     ) public onlyFactory {
-        Course storage existingCourse = courses[coursecounter];
-        existingCourse.id = course.id;
-        existingCourse.title = course.title;
-        existingCourse.description = course.description;
-        existingCourse.level = course.level;
-        existingCourse.url = course.url;
-        existingCourse.longDescription = course.longDescription;
-        existingCourse.instructor = course.instructor;
-        existingCourse.objectives = course.objectives;
-        existingCourse.category = course.category;
-        existingCourse.prerequisites = course.prerequisites;
-        existingCourse.lessons = course.lessons;
-        existingCourse.duration = course.duration;
-        courses[coursecounter] = existingCourse;
-        courseCounter = coursecounter;
+        courses[coursecounter] = course;
+        courseCounter = coursecounter + 1;
     }
 
     function updateCourse(
         Course memory course,
         uint256 coursecounter
     ) public onlyFactory {
-        Course storage existingCourse = courses[coursecounter];
-        existingCourse.title = course.title;
-        existingCourse.description = course.description;
-        existingCourse.level = course.level;
-        existingCourse.url = course.url;
-        existingCourse.longDescription = course.longDescription;
-        existingCourse.instructor = course.instructor;
-        existingCourse.objectives = course.objectives;
-        existingCourse.category = course.category;
-        existingCourse.prerequisites = course.prerequisites;
-        existingCourse.lessons = course.lessons;
-        existingCourse.duration = course.duration;
-        courses[coursecounter] = existingCourse;
+        courses[coursecounter] = course;
     }
 
     function numCourses() public view returns (uint256) {
@@ -172,32 +161,5 @@ contract Level3Course is ERC2771Context, ILevel3Course, Ownable {
             courseParticipants[i] = participants[i].length;
         }
         return courseParticipants;
-    }
-
-    function _msgSender()
-        internal
-        view
-        override(Context, ERC2771Context)
-        returns (address sender)
-    {
-        return ERC2771Context._msgSender();
-    }
-
-    function _msgData()
-        internal
-        view
-        override(Context, ERC2771Context)
-        returns (bytes calldata)
-    {
-        return ERC2771Context._msgData();
-    }
-
-    function _contextSuffixLength()
-        internal
-        view
-        override(Context, ERC2771Context)
-        returns (uint256)
-    {
-        return ERC2771Context._contextSuffixLength();
     }
 }

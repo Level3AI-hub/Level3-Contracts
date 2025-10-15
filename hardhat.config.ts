@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
     hardhat: {},
     bsc: {
       url: API_URL,
-      chainId: 97,
+      chainId: 56,
       accounts: [`0x${PRIVATE_KEY}`],
     },
   },

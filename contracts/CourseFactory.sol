@@ -24,6 +24,11 @@ contract CourseFactory is Ownable, ILevel3Course {
         return courseCounter;
     }
 
+    function deleteCourse(uint256 _courseId) public {
+        delete courses[_courseId];
+        level3Course.deleteCourse(_courseId);
+    }
+
     function addCourse(
         string memory _title,
         string memory _description,
@@ -35,7 +40,7 @@ contract CourseFactory is Ownable, ILevel3Course {
         string memory _level,
         string memory _url,
         Lesson[] memory lessons,
-         string memory _duration
+        string memory _duration
     ) public onlyOwner {
         Course storage c = courses[courseCounter];
         c.id = courseCounter;
@@ -50,7 +55,7 @@ contract CourseFactory is Ownable, ILevel3Course {
         c.prerequisites = _prerequisites;
         c.lessons = lessons;
         c.duration = _duration;
-        level3Course.updateCourseRegistry(c, courseCounter);
+        level3Course.updateCourseRegistry(courseCounter, c);
         emit CourseAdded(courseCounter, _title);
         courseCounter = courseCounter + 1;
     }
