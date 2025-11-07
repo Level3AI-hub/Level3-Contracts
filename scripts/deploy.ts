@@ -3,11 +3,11 @@ import 'dotenv/config'
 
 async function main() {
   const owner =
-    process.env.OWNER_ADDRESS || '0x2a0d7311fa7e9ac2890cfd8219b2def0c206e79b'
+    process.env.OWNER_ADDRESS || '0x54b268AAB70C3Eda916C166D912ff8AB107c84fd'
 
   const Contract = await ethers.getContractFactory('Level3Course')
-  const reverseAddress = '0xc070aAcE207ad5eb2A460D059785ffC9D4D2C536'
-  const registry = '0x6aEFc7ac590096c08187a9052030dA59dEd7E996'
+  const reverseAddress = '0x1D0831eA9486Fada3887a737E8d6f8C6Ad72a125'
+  const registry = '0xa886B8897814193f99A88701d70b31b4a8E27a1E'
   const contract = await Contract.deploy(reverseAddress, owner, registry)
   const course = await contract.getAddress()
 
@@ -18,7 +18,9 @@ async function main() {
   const CourseFactory = await factory.getAddress()
 
   console.log('CourseFactory deployed to address:', CourseFactory)
-  const tx = await contract.setCourseFactory(CourseFactory)
+  const tx = await contract.setCourseFactory(
+    CourseFactory
+  )
   console.log(`Added Course Factory, ${tx.hash}`)
 }
 main()

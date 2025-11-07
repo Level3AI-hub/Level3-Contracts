@@ -26,7 +26,7 @@ async function main() {
   const { ethers } = hre
 
   const courses: Course[] = [
-    /* {
+   /* {
       id: 0,
       title: 'Using Hooks And Headlines To Grab Attention',
       description:
@@ -113,7 +113,7 @@ By the end of this quick, fun-packed journey, you’ll have a content creation s
       ],
       duration: '30',
     },
-    {
+   /* {
       id: 1,
       title: 'Personal Branding For Modern Creators',
       description:
@@ -309,8 +309,8 @@ By the end, you'll feel confident managing wallets, recognizing scams, and prote
         'Develop a long-term security mindset that reduces risks while navigating Web3.',
       ],
       duration: '30',
-    }, */
-    /* {
+    },
+     {
       id: 1,
       title: 'Skyrocketing Your Small Business With AI',
       description:
@@ -407,8 +407,8 @@ By the end, you'll feel confident managing wallets, recognizing scams, and prote
       prerequisites: ['Minted .safu domain'],
       objectives: [],
       duration: '30',
-    },*/
-    {
+    }, */
+   {
       id: 4,
       title: 'InfoFi Playbook Course: Winning the Game of Attention on Kaito',
       description:
@@ -512,7 +512,7 @@ By the end, you'll feel confident managing wallets, recognizing scams, and prote
   ]
   const factory = await ethers.getContractAt(
     'CourseFactory',
-    '0xED7ee266dA46FA01a97F615d26D38C425673db23',
+    '0xE796bc81c3F372237641998c24C755e710832bA9',
   )
 
   for (const course of courses) {

@@ -5,7 +5,7 @@ import "dotenv/config"
 
 const { API_URL, PRIVATE_KEY } = process.env
 
-
+import './tasks/etherscan-multichain.ts'
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [
@@ -33,8 +33,9 @@ const config: HardhatUserConfig = {
   etherscan: {
     // Your API key for Etherscan
     // Obtain one at https://etherscan.io/
-    apiKey: 'HQSWZD76WZNUSSICASNV9UKT38511WIAVZ',
+    apiKey: process.env.API_KEY,
   },
+  
   sourcify: {
     // Disabled by default
     // Doesn't need an API key

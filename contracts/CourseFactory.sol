@@ -24,7 +24,7 @@ contract CourseFactory is Ownable, ILevel3Course {
         return courseCounter;
     }
 
-    function deleteCourse(uint256 _courseId) public {
+    function deleteCourse(uint256 _courseId) public onlyOwner {
         delete courses[_courseId];
         level3Course.deleteCourse(_courseId);
     }
